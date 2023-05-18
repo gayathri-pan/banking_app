@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,12 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-td9d&-sv5+m+_yvco4fnk20v=ngdk0qds=hs4%j%d%da5ewl_q'
+SECRET_KEY = 'os.environ.get("SECRET_KEY")'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["paylio.up.railway.app"]
 
 
 # Application definition
@@ -45,7 +46,10 @@ INSTALLED_APPS = [
     # Custom Apps
     'core',
     'userauths',
-    'account'
+    'account',
+    "storages",
+    
+    
 ]
 
 MIDDLEWARE = [
@@ -88,6 +92,21 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': "railway",
+#         'USER': "postgres",
+#         'PASSWORD': "8mQ7HNiw02WgdBdzNydx",
+#         'HOST': "containers-us-west-177.railway.app",
+#         'PORT': 5620,
+#     }
+# }
+
+db_from_env = dj_database_url.config(conn_max_age=600)
+DATABASES['default'].update(db_from_env)
+
 
 
 # Password validation
@@ -135,6 +154,7 @@ LOGOUT_REDIRECT_URL = "userauths:sign-in"
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -154,3 +174,29 @@ JAZZMIN_SETTINGS = {
     "copyright": "Paylio - All RIght Reserverd © Copyright 2023",
     # "order_with_respect_to": ["core", 'userauths', "transactions" , 'addon', 'blog']
 }
+
+
+
+AWS_ACCESS_KEY_ID = "AKIAZK5IZZVYNHEWXOMW"
+
+AWS_SECRET_ACCESS_KEY = "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"
+
+AWS_STORAGE_BUCKET_NAME = "payment-desphixs"
+
+AWS_S3_FILE_OVERWRITE = False
+
+AWS_DEFAULT_ACL = None
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+
+AWS_LOCATION = 'static'
+
+STATIC_LOCATION = 'static'
+
+STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/'

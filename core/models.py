@@ -32,6 +32,16 @@ CARD_TYPE = (
 
 )
 
+
+NOTIFICATION_TYPE = (
+    ("None", "None"),
+    ("Transfer", "Transfer"),
+    ("Payment Request", "Payment Request"),
+    ("Funded Credit Card", "Funded Credit Card"),
+    ("Deleted Credit Card", "Deleted Credit Card"),
+
+)
+
 class Transaction(models.Model):
     transaction_id = ShortUUIDField(unique=True, length=15, max_length=20, prefix="TRN")
    
@@ -77,3 +87,18 @@ class CreditCard(models.Model):
 
     def __str__(self):
         return f"{self.user}"
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    notification_type = models.CharField(max_length=100, choices=NOTIFICATION_TYPE, default="none")
+    is_read = models.BooleanField(default=False)
+    date = models.DateTimeField(auto_now_add=True)
+    nid = ShortUUIDField(length=10, max_length=25, alphabet="abcdefghijklmnopqrstuvxyz")
+    
+    class Meta:
+        ordering = ["-date"]
+        verbose_name_plural = "Notification"
+
+    def __str__(self):
+        return f"{self.user} - {self.notification_type}"
